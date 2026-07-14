@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu Fondation - Joueur 2</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a2e; color: #e9e9f2; padding: 20px; }
+        h1, h2, h3, h4 { color: #87ceeb; }
+        .container { display: flex; max-width: 1200px; margin: auto; }
+        #status { flex: 2; padding-right: 20px; border-right: 1px solid #3d3d6e; }
+        #actions { flex: 1; padding-left: 20px; }
+        button, input { padding: 10px; margin: 5px 0; border-radius: 5px; border: none; cursor: pointer; background-color: #3d3d6e; color: white; transition: background-color 0.3s; }
+        button:hover { background-color: #4b4b8a; }
+        .my-turn { background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; }
+        .opponent-turn { background-color: #ffa500; color: black; padding: 10px; border-radius: 5px; text-align: center; }
+        .destroyed { color: red; font-weight: bold; }
+        ul { list-style: none; padding-left: 0; }
+        #last-message { border-top: 1px solid #3d3d6e; margin-top: 20px; padding: 10px; background-color: #333; }
+        
+        /* GRILLE */
+        .board-grid { border-collapse: collapse; margin-top: 20px; }
+        .board-grid td { width: 32px; height: 32px; border: 1px solid #3d3d6e; text-align: center; font-size: 12px; }
+        .cell-v1 { background-color: rgba(0, 191, 255, 0.3); }
+        .cell-v2 { background-color: rgba(255, 69, 0, 0.3); }
+        .cell-d1 { border: 2px solid rgba(0, 191, 255, 0.8); }
+        .cell-d2 { border: 2px solid rgba(255, 69, 0, 0.8); }
+        .cell-destroyed { text-decoration: line-through; color: #ff4d4d; }
+        .cell-attack { box-shadow: 0 0 10px rgba(255, 0, 0, 0.9); }
+
+        /* STYLE MALUS (SABOTAGE) */
+        .cell-sabotaged {
+            border: 3px dashed #ffa500 !important;
+            background-color: rgba(255, 165, 0, 0.4) !important;
+            animation: sabotage-blink 1s infinite;
+        }
+        .malus-alert {
+            color: #ffa500;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: sabotage-blink 1s infinite;
+        }
+        @keyframes sabotage-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* STYLE PRÉVISUALISATION */
+        .preview-move {
+            background-color: rgba(255, 0, 255, 0.6) !important;
+            box-shadow: inset 0 0 0 3px #ffffff, 0 0 15px #ff00ff !important;
+            position: relative !important;
+            z-index: 100 !important;
+            transition: all 0.2s;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="board.js?v=4"></script> </head>
+<body>
+    <div id="player-role">
+        <h1>Flotte Impériale (Joueur 2)</h1>
+    </div>
+
+    <div class="game-interface">
+        
+        <div id="board-wrapper">
+            <h3>📡 Radar Tactique</h3>
+            <div id="board"></div>
+            <div id="last-message" style="margin-top: 20px; color: var(--neon-blue);"></div>
+        </div>
+
+        <div id="status" class="panel" data-joueur-actif-id="1">
+            <h2>System // Initialisation...</h2>
+        </div>
+
+        <div id="actions" class="panel">
+            <h3>🕹️ Commandes</h3>
+            
+            <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 5px;">COORDONNÉES CIBLE :</div>
+            <div class="coords-input">
+                <label>X:</label><input type="number" id="move_x" value="9" min="1" max="10">
+                <label>Y:</label><input type="number" id="move_y" value="9" min="1" max="10">
+            </div>
+
+            <button onclick="sendAction('deplacer')">🚀 Manoeuvre de Déplacement</button>
+            <button onclick="sendAction('tirer')">💥 Tirer Canons</button>
+
+            <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #888;">DÉPLOIEMENT DRONES</h4>
+                <div class="drone-grid">
+                    <button onclick="sendAction('lancer_drone_attaque')">🛸 Attaque</button>
+                    <button onclick="sendAction('lancer_drone_bouclier')">🛡️ Bouclier</button>
+                    <button onclick="sendAction('lancer_drone_sabotage')">⚙️ Sabotage</button>
+                    <button onclick="sendAction('lancer_drone_reparation')">🔧 Répar.</button>
+                    <button onclick="sendAction('lancer_drone_kamikaze')" class="btn-kamikaze">💣 KAMIKAZE</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const endpoint = 'action.php';
+        const POLLING_INTERVAL = 2000;
+        const currentPlayerId = 2; // C'EST ICI QUE ÇA CHANGE POUR J2
+        let pollingTimer = null;
+
+        function updatePreviewSelection() {
+            $('.preview-move').removeClass('preview-move');
+            const x = parseInt($('#move_x').val());
+            const y = parseInt($('#move_y').val());
+            if (!isNaN(x) && !isNaN(y) && x >= 1 && x <= 10 && y >= 1 && y <= 10) {
+                const $cell = $(`td[data-x="${x}"][data-y="${y}"]`);
+                if ($cell.length > 0) $cell.addClass('preview-move');
+            }
+        }
+
+        $(document).ready(function() {
+            $('#move_x, #move_y').on('input change keyup', function() { updatePreviewSelection(); });
+        });
+
+        function sendAction(typeAction) {
+            if (typeAction !== 'initialiser' && typeAction !== 'get_status') {
+                const joueurActif = parseInt($('#status').attr('data-joueur-actif-id'));
+                if (currentPlayerId !== joueurActif) {
+                    alert("Ce n'est pas votre tour !");
+                    return;
+                }
+            }
+
+            let data = { joueur_id: currentPlayerId, type_action: typeAction };
+
+            if (typeAction === 'deplacer' || typeAction === 'lancer_drone_attaque') {
+                data.x = $('#move_x').val();
+                data.y = $('#move_y').val();
+            }
+
+            $.ajax({
+                url: endpoint, method: 'POST', data: data, dataType: 'json',
+                success: function (response) { updateStatus(response); },
+                error: function (xhr, status, error) { console.error("Erreur AJAX:", error); }
+            });
+        }
+
+        function updateStatus(data) {
+            const statusDiv = $('#status');
+            const actionsDiv = $('#actions');
+            const msgDiv = $('#last-message');
+            const etat = data.etat_jeu;
+            const res = data.action_result;
+            let html = "<h2>Tour " + etat.tour_courant + " - Statut : " + etat.statut.toUpperCase() + "</h2>";
+            
+            if (res && res.message) msgDiv.text("[" + new Date().toLocaleTimeString() + "] " + res.message);
+
+            const joueurActifId = etat.joueur_actif_id;
+            statusDiv.attr('data-joueur-actif-id', joueurActifId);
+
+            if (etat.statut === 'en_cours') {
+                if (joueurActifId === currentPlayerId) {
+                    html += '<div class="my-turn">C\'est VOTRE tour !</div>';
+                    actionsDiv.show();
+                } else {
+                    html += '<div class="opponent-turn">Tour de l\'adversaire (Joueur ' + joueurActifId + ')</div>';
+                    actionsDiv.hide();
+                }
+            } else {
+                html += '<h3 class="destroyed">Partie terminée !</h3>';
+                actionsDiv.hide();
+                if (pollingTimer) clearInterval(pollingTimer);
+            }
+
+            const jData = etat['joueur' + currentPlayerId];
+            const advId = currentPlayerId === 1 ? 2 : 1;
+            const aData = etat['joueur' + advId];
+
+            let monMalus = jData.malus > 0 ? `<li class="malus-alert">⚠️ SABOTÉ ! (${jData.malus} tours)</li>` : '';
+            let advMalus = aData.malus > 0 ? `<li class="malus-alert">⚠️ ENNEMI SABOTÉ (${aData.malus} tours)</li>` : '';
+
+            html += `
+                <h4>🛡️ Mon Vaisseau (${jData.vaisseau.nom})</h4>
+                <ul>
+                    <li style="color: #ff4d4d; font-weight:bold;">❤️ Vie : ${jData.vaisseau.vie}</li>
+                    <li style="color: #00d2ff; font-weight:bold;">⚡ Énergie : ${jData.vaisseau.energie}</li>
+                    <li style="color: #ffff00; font-weight:bold;">📦 Stock Drones : ${jData.nbDrones}</li>
+                    ${monMalus}
+                    <li>📍 Position : (${jData.vaisseau.position.x}, ${jData.vaisseau.position.y})</li>
+                </ul>`;
+
+            html += `
+                <h4>⚔️ Vaisseau Adversaire (${aData.vaisseau.nom})</h4>
+                <ul>
+                    <li style="color: #ff4d4d; font-weight:bold;">❤️ Vie : ${aData.vaisseau.vie}</li>
+                    ${advMalus}
+                    <li>📍 Position : (${aData.vaisseau.position.x}, ${aData.vaisseau.position.y})</li>
+                </ul>`;
+
+            statusDiv.html(html);
+            renderBoard(etat, currentPlayerId, '#board', res);
+            updatePreviewSelection();
+        }
+
+        $(function () {
+            sendAction('initialiser');
+            pollingTimer = setInterval(function () { sendAction('get_status'); }, POLLING_INTERVAL);
+        });
+    </script>
+</body>
+</html>

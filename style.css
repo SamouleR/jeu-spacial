@@ -1,0 +1,398 @@
+/* style.css - Thème Cyberpunk / Sci-Fi Complet */
+
+/* Import des polices futuristes */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap');
+
+:root {
+    /* Palette de couleurs */
+    --bg-deep: #050510;
+    --bg-panel: rgba(13, 13, 25, 0.95);
+    --neon-purple: #bc13fe;
+    --neon-blue: #00f3ff;
+    --neon-green: #00ff9d;
+    --neon-orange: #ff9f1c;
+    --neon-red: #ff2a2a;
+    --neon-pink: #ff00ff;
+    
+    --text-main: #e0e6ed;
+    --text-dim: #8a8a9b;
+    --grid-line: #1a1a2e;
+}
+
+body {
+    font-family: 'Rajdhani', sans-serif;
+    background-color: var(--bg-deep);
+    /* Fond stellaire subtil */
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(188, 19, 254, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 243, 255, 0.05) 0%, transparent 50%);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Évite le scroll horizontal */
+}
+
+/* --- TITRE PRINCIPAL --- */
+#player-role h1 {
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    color: var(--neon-purple);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 2rem;
+    text-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+    padding-bottom: 15px;
+}
+
+/* --- LAYOUT GLOBAL (Flexbox : Gauche / Droite) --- */
+.game-interface {
+    display: flex;
+    flex-direction: row;       /* Force l'alignement horizontal */
+    align-items: stretch;      /* Étire les éléments sur la hauteur */
+    gap: 25px;                 /* Espace entre les colonnes */
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 80vh;              /* Hauteur fixe pour l'interface */
+}
+
+/* ZONE GAUCHE : RADAR (Board) */
+#board-wrapper {
+    flex: 2;                   /* Prend ~66% de l'espace */
+    background: var(--bg-panel);
+    border: 1px solid var(--neon-purple);
+    box-shadow: 0 0 25px rgba(188, 19, 254, 0.15);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Décoration "coin technologique" sur le radar */
+#board-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px;
+    width: 30px; height: 30px;
+    border-top: 3px solid var(--neon-blue);
+    border-left: 3px solid var(--neon-blue);
+}
+
+#board-wrapper h3 {
+    width: 100%;
+    text-align: left;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-blue);
+    border-left: 4px solid var(--neon-blue);
+    padding-left: 15px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+/* ZONE DROITE : SIDEBAR (Contient Status + Actions) */
+.sidebar {
+    flex: 1;                   /* Prend ~33% de l'espace */
+    display: flex;
+    flex-direction: column;    /* Empile Status et Actions verticalement */
+    gap: 20px;
+    height: 100%;
+    min-width: 320px;          /* Largeur minimum pour ne pas écraser les boutons */
+}
+
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--grid-line);
+    border-top: 2px solid var(--neon-purple); /* Accent couleur en haut */
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;          /* Scroll si le contenu dépasse */
+}
+
+/* Répartition de l'espace dans la sidebar */
+#status {
+    flex: 0 0 auto; /* Taille automatique selon le contenu */
+}
+
+#actions {
+    flex: 1;        /* Prend tout l'espace restant en bas */
+}
+
+/* --- TYPOGRAPHIE PANNEAUX --- */
+.panel h2, .panel h3, .panel h4 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--text-main);
+    text-transform: uppercase;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.panel h2 { color: var(--neon-green); font-size: 1.1rem; }
+.panel h3 { color: var(--neon-blue); }
+
+/* --- GRILLE DE JEU (STYLE RADAR) --- */
+.board-grid {
+    border-collapse: separate;
+    border-spacing: 3px;
+    margin: 0 auto;
+}
+
+.board-grid td {
+    width: 45px;
+    height: 45px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--grid-line);
+    color: transparent; /* Cache le texte "V1/V2" par défaut */
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    position: relative; /* INDISPENSABLE pour z-index */
+    cursor: crosshair;
+}
+
+.board-grid td:hover {
+    border-color: var(--text-dim);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- STYLES DES CELLULES --- */
+
+/* Vaisseau Joueur 1 (Cyan) */
+.cell-v1 {
+    border: 2px solid var(--neon-blue) !important;
+    background-color: rgba(0, 243, 255, 0.2) !important;
+    box-shadow: 0 0 15px var(--neon-blue);
+    color: var(--neon-blue) !important;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px !important;
+    font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Vaisseau Joueur 2 (Violet) */
+.cell-v2 {
+    border: 2px solid var(--neon-purple) !important;
+    background-color: rgba(188, 19, 254, 0.2) !important;
+    box-shadow: 0 0 15px var(--neon-purple);
+    color: var(--neon-purple) !important;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px !important;
+    font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Drones */
+.cell-d1 { border: 1px dashed var(--neon-blue) !important; opacity: 0.8; }
+.cell-d2 { border: 1px dashed var(--neon-purple) !important; opacity: 0.8; }
+
+/* PRÉVISUALISATION (Rose Fluo) */
+.preview-move {
+    background-color: rgba(255, 0, 255, 0.5) !important;
+    border: 2px solid #ff00ff !important;
+    box-shadow: inset 0 0 0 2px #ffffff, 0 0 20px #ff00ff !important;
+    z-index: 100 !important; /* Passe au-dessus de tout */
+}
+
+/* SABOTAGE (Orange clignotant) */
+.cell-sabotaged {
+    border: 3px dashed var(--neon-orange) !important;
+    background-color: rgba(255, 159, 28, 0.3) !important;
+    animation: sabotage-blink 1s infinite alternate;
+}
+
+@keyframes sabotage-blink {
+    from { box-shadow: 0 0 5px var(--neon-orange) inset; opacity: 0.7; }
+    to { box-shadow: 0 0 20px var(--neon-orange) inset; opacity: 1; }
+}
+
+/* EFFET DESTRUCTION */
+.cell-destroyed {
+    background-color: #000 !important;
+    border-color: #333 !important;
+    color: #555 !important;
+    text-decoration: line-through;
+}
+
+/* EFFET ATTAQUE (Flash rouge) */
+.cell-attack {
+    animation: flashRed 0.5s ease-out;
+}
+@keyframes flashRed {
+    0% { background-color: rgba(255, 0, 0, 0.8); }
+    100% { background-color: transparent; }
+}
+
+/* --- INFO & STATS --- */
+#status ul {
+    margin: 0; padding: 0;
+    margin-bottom: 15px;
+}
+#status li {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+#status li span {
+    color: var(--text-main);
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Messages d'alerte dans le panneau */
+.alert-box {
+    color: var(--neon-orange);
+    border: 1px solid var(--neon-orange);
+    background: rgba(255, 159, 28, 0.1);
+    padding: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-align: center;
+    border-radius: 4px;
+}
+.malus-alert {
+    color: var(--neon-orange) !important;
+    font-weight: bold;
+}
+
+/* --- ACTIONS & BOUTONS --- */
+.coords-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    background: rgba(0,0,0,0.4);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--grid-line);
+}
+
+.coords-input label {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-blue);
+}
+
+input[type="number"] {
+    background: transparent;
+    border: 1px solid var(--text-dim);
+    color: white;
+    padding: 5px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+}
+input[type="number"]:focus {
+    border-color: var(--neon-blue);
+    outline: none;
+    box-shadow: 0 0 5px var(--neon-blue);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: transparent;
+    border: 1px solid var(--text-dim);
+    color: var(--text-dim);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+}
+
+button:hover {
+    color: #fff;
+    border-color: #fff;
+    transform: translateY(-1px);
+}
+
+/* Bouton Déplacement (Violet) */
+button[onclick*="deplacer"] {
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+}
+button[onclick*="deplacer"]:hover {
+    background: var(--neon-purple);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-purple);
+}
+
+/* Bouton Tir (Rouge) */
+button[onclick*="tirer"] {
+    border-color: var(--neon-red);
+    color: var(--neon-red);
+}
+button[onclick*="tirer"]:hover {
+    background: var(--neon-red);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-red);
+}
+
+/* Grille de Drones */
+.drone-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.drone-grid button {
+    font-size: 0.7rem;
+    padding: 8px;
+    margin: 0;
+}
+.drone-grid button:hover {
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+    box-shadow: inset 0 0 10px var(--neon-blue);
+}
+
+/* Bouton Kamikaze */
+.btn-kamikaze {
+    grid-column: 1 / -1; /* Prend toute la largeur */
+    border-color: var(--neon-orange) !important;
+    color: var(--neon-orange) !important;
+}
+.btn-kamikaze:hover {
+    background: var(--neon-orange) !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px var(--neon-orange);
+}
+
+/* --- MESSAGES LOGS --- */
+#last-message {
+    margin-top: 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: var(--neon-green);
+    text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+    min-height: 20px;
+}
+
+/* --- RESPONSIVE (Mobile) --- */
+@media (max-width: 900px) {
+    .game-interface {
+        flex-direction: column;
+        height: auto;
+    }
+    #board-wrapper, .sidebar {
+        width: 100%;
+        flex: none;
+    }
+    .sidebar {
+        height: auto;
+    }
+}

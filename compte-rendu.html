@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport de Projet - SpaceWar AJAX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050510;
+            --bg-panel: rgba(13, 13, 25, 0.95);
+            --neon-purple: #bc13fe;
+            --neon-blue: #00f3ff;
+            --neon-green: #00ff9d;
+            --neon-orange: #ff9f1c;
+            --neon-red: #ff2a6d;
+            --text-main: #e0e6ed;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-deep);
+            /* Fond dégradé simple et statique */
+            background-image: radial-gradient(circle at 50% 30%, #1a0b2e 0%, #020205 80%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            border-bottom: 2px solid var(--neon-purple);
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-purple);
+            text-transform: uppercase;
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 0 0 15px var(--neon-purple);
+        }
+
+        .subtitle {
+            color: var(--neon-blue);
+            font-size: 1.4rem;
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--neon-blue);
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin: 0 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        nav a:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+            transform: scale(1.1);
+        }
+
+        /* --- CONTENT --- */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        section {
+            background: var(--bg-panel);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-left: 4px solid var(--neon-blue);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--neon-purple);
+            margin-top: 30px;
+            font-size: 1.3rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        p, ul { font-size: 1.1rem; color: #ccc; }
+        strong { color: white; }
+
+        .btn-play {
+            display: inline-block;
+            background: var(--neon-green);
+            color: #050510;
+            padding: 15px 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border-radius: 4px;
+            box-shadow: 0 0 20px var(--neon-green);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+        .btn-play:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 0 30px var(--neon-green);
+            background: white;
+        }
+
+        /* --- DRONE CARDS GRID --- */
+        .drone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .drone-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--text-dim);
+            padding: 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drone-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .drone-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
+
+        .drone-card.attack .drone-title { color: var(--neon-red); }
+        .drone-card.shield .drone-title { color: var(--neon-blue); }
+        .drone-card.sabotage .drone-title { color: var(--neon-orange); }
+        .drone-card.repair .drone-title { color: var(--neon-green); }
+        .drone-card.kamikaze .drone-title { color: var(--neon-purple); }
+
+        .drone-stat {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+        .drone-stat span { color: white; }
+
+        /* --- DOWNLOAD BUTTON STYLE --- */
+        .download-area {
+            text-align: center;
+            margin: 80px 0 40px 0;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-download {
+            display: inline-block;
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 20px 60px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-download::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-download:hover {
+            background: var(--neon-blue);
+            color: #050510;
+            box-shadow: 0 0 50px var(--neon-blue), inset 0 0 20px rgba(255,255,255,0.5);
+            transform: translateY(-5px);
+            text-shadow: none;
+        }
+        
+        .btn-download:hover::before { left: 100%; }
+
+        /* --- FILE TREE ARCHITECTURE --- */
+        .file-tree {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--text-dim);
+            border-radius: 6px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-top: 20px;
+        }
+        .ft-folder { color: var(--neon-purple); font-weight: bold; }
+        .ft-file { color: var(--neon-blue); }
+        .ft-comment { color: var(--text-dim); font-style: italic; margin-left: 15px; opacity: 0.7; }
+        .ft-line { margin-bottom: 5px; }
+
+        /* --- CODE BLOCKS & DETAILS --- */
+        details {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--text-dim);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 15px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            background: rgba(255,255,255,0.05);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            background: #1e1e2e;
+            color: #a6accd;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--text-dim);
+            max-height: 500px;
+        }
+
+        code { font-family: 'Courier New', monospace; }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+            font-family: sans-serif;
+        }
+        .tag-php { background: #777bb4; color: white; }
+        .tag-js { background: #f7df1e; color: black; }
+        .tag-css { background: #264de4; color: white; }
+        .tag-html { background: #e34c26; color: white; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SpaceWar : Fondation</h1>
+        <div class="subtitle">Rapport de Projet - Développement Web Avancé</div>
+        <div style="margin-top: 15px; color: var(--text-dim);">Rendu le 6 Décembre</div>
+    </header>
+
+    <nav>
+        <a href="#presentation">Le Jeu</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#technique">Logique Technique</a>
+        <a href="#bilan">Bilan</a>
+        <a href="#annexes">Annexe 1 : Extraits</a>
+        <a href="#fullcode">Annexe 2 : Code Complet</a>
+    </nav>
+
+    <div class="container">
+
+        <section id="presentation">
+            <h2>🚀 Présentation et Accès</h2>
+            <p>
+                <strong>SpaceWar</strong> est un jeu de stratégie spatiale tactique au tour par tour. 
+                Il met en scène un affrontement entre deux joueurs sur une grille de 10x10 cases.
+                Le projet a été réalisé en utilisant <strong>PHP Orienté Objet</strong> pour la logique serveur et <strong>JavaScript (AJAX/jQuery)</strong> pour l'interactivité client.
+            </p>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="index.html" class="btn-play" target="_blank">LANCER LA PARTIE</a>
+                <p style="font-size: 0.9rem; color: var(--text-dim); margin-top: 15px;">
+                    (Pour tester : Ouvrez le lien dans deux onglets différents, choisissez Joueur 1 puis Joueur 2)
+                </p>
+            </div>
+
+            <h3>📜 Règles Générales</h3>
+            <ul>
+                <li><strong>Objectif :</strong> Détruire le vaisseau adverse en réduisant ses PV à 0.</li>
+                <li><strong>Tour par Tour :</strong> Les joueurs jouent chacun leur tour. Un système de synchronisation empêche de jouer deux fois de suite.</li>
+                <li><strong>Gestion de l'Énergie :</strong> Chaque action consomme de l'énergie (Déplacement, Tir, Drones). L'énergie se régénère de 10 pts/tour.</li>
+                <li><strong>Déplacements :</strong> Le coût en énergie dépend de la distance parcourue (2 énergie / case).</li>
+            </ul>
+
+            <h3>🤖 Guide Tactique des Drones</h3>
+            <p>Chaque drone a un comportement codé spécifiquement dans la classe <code>Partie.php</code>. Voici leurs effets techniques :</p>
+            
+            <div class="drone-grid">
+                <div class="drone-card attack">
+                    <span class="drone-title">⚔️ Drone d'Attaque</span>
+                    <div class="drone-stat">Coût : <span>30 Énergie</span></div>
+                    <div class="drone-stat">Portée lancement : <span>4 cases</span></div>
+                    <p style="font-size:0.95rem; margin-top:10px;">
+                        <strong>Immédiat :</strong> Inflige 15 dégâts directs au vaisseau ennemi.<br>
+                        <strong>Passif (Fin de tour) :</strong> Si l'ennemi reste à 3 cases ou moins du drone, il subit automatiquement 10 dégâts supplémentaires à chaque tour.
+                    </p>
+                </div>
+
+                <div class="drone-card shield">
+                    <span class="drone-title">🛡️ Drone Bouclier</span>
+                    <div class="drone-stat">Coût : <span>30 Énergie</span></div>
+                    <div class="drone-stat">Position : <span>Sur soi</span></div>
+                    <p style="font-size:0.95rem; margin-top:10px;">
+                        Ajoute <strong>+30 Points de Bouclier</strong> au joueur.
+                        Les points de bouclier absorbent les dégâts reçus avant que la coque (PV) ne soit touchée.
+                    </p>
+                </div>
+
+                <div class="drone-card sabotage">
+                    <span class="drone-title">⚡ Drone Sabotage</span>
+                    <div class="drone-stat">Coût : <span>30 Énergie</span></div>
+                    <div class="drone-stat">Portée : <span>3 cases</span></div>
+                    <p style="font-size:0.95rem; margin-top:10px;">
+                        Pirate le système d'armement adverse. Applique un <strong>Malus</strong> pour 2 tours.
+                        <br><em>Effet :</em> Les dégâts infligés par l'ennemi sont divisés par 2.
+                    </p>
+                </div>
+
+                <div class="drone-card repair">
+                    <span class="drone-title">🔧 Drone Réparation</span>
+                    <div class="drone-stat">Coût : <span>30 Énergie</span></div>
+                    <div class="drone-stat">Position : <span>Sur soi</span></div>
+                    <p style="font-size:0.95rem; margin-top:10px;">
+                        Se soude à la coque pour effectuer une réparation d'urgence.
+                        <br>Restitue immédiatement <strong>+20 PV</strong> au vaisseau.
+                    </p>
+                </div>
+
+                <div class="drone-card kamikaze">
+                    <span class="drone-title">💥 Drone Kamikaze</span>
+                    <div class="drone-stat">Coût : <span>30 Énergie</span></div>
+                    <div class="drone-stat">Portée : <span>1 case (Adjacent)</span></div>
+                    <p style="font-size:0.95rem; margin-top:10px;">
+                        Le drone se jette sur l'ennemi et explose.
+                        <br><strong>Effet Critique :</strong> Inflige 30 dégâts massifs. Le drone est détruit instantanément.
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="architecture">
+            <h2>🏗️ Organisation et Architecture</h2>
+            <p>Le projet est structuré pour séparer clairement la vue (Frontend) de la logique métier (Backend).</p>
+
+            <h3>📂 Structure des Fichiers</h3>
+            <div class="file-tree">
+                <div class="ft-line"><span class="ft-folder">racine_du_projet/</span></div>
+                
+                <div class="ft-line">├── <span class="ft-file">index2.php</span> <span class="ft-comment"># Page d'accueil (Introduction Vidéo)</span></div>
+                <div class="ft-line">├── <span class="ft-file">joueur1.html</span> <span class="ft-comment"># Interface de jeu pour le Joueur 1</span></div>
+                <div class="ft-line">├── <span class="ft-file">joueur2.html</span> <span class="ft-comment"># Interface de jeu pour le Joueur 2</span></div>
+                <div class="ft-line">├── <span class="ft-file">style.css</span> <span class="ft-comment"># Feuille de style globale (Thème Cyberpunk)</span></div>
+                <div class="ft-line">├── <span class="ft-file">board.js</span> <span class="ft-comment"># Moteur JS de rendu de la grille</span></div>
+                
+                <div class="ft-line">│</div>
+                <div class="ft-line">├── <span class="ft-file">action.php</span> <span class="ft-comment"># API : Reçoit les requêtes AJAX et renvoie le JSON</span></div>
+                <div class="ft-line">├── <span class="ft-file">partie.dat</span> <span class="ft-comment"># Fichier de persistance (Données sérialisées)</span></div>
+                
+                <div class="ft-line">│</div>
+                <div class="ft-line">├── <span class="ft-folder">Classes PHP (Backend)</span></div>
+                <div class="ft-line">│   ├── <span class="ft-file">Partie.php</span> <span class="ft-comment"># Contrôleur principal du jeu</span></div>
+                <div class="ft-line">│   ├── <span class="ft-file">Joueur.php</span> <span class="ft-comment"># Modèle Joueur (Vaisseau + Inventaire)</span></div>
+                <div class="ft-line">│   ├── <span class="ft-file">Vaisseau.php</span> <span class="ft-comment"># Modèle Vaisseau (Vie, Énergie, Actions)</span></div>
+                <div class="ft-line">│   └── <span class="ft-file">Drone.php</span> <span class="ft-comment"># Modèle Drone</span></div>
+            </div>
+
+            <h3>Rôle des Composants</h3>
+            <ul>
+                <li><strong>Modèle (PHP) :</strong> Les classes <code>Vaisseau</code>, <code>Drone</code> et <code>Partie</code> encapsulent toute la logique métier et les règles (vérification de portée, coûts, dégâts).</li>
+                <li><strong>Contrôleur (action.php) :</strong> Il agit comme une passerelle. Il charge l'état depuis le fichier, exécute la demande du client, sauvegarde et renvoie la réponse.</li>
+                <li><strong>Vue (HTML/JS) :</strong> <code>board.js</code> et les fichiers HTML gèrent uniquement l'affichage et l'envoi des commandes. Ils ne calculent rien (pour éviter la triche).</li>
+            </ul>
+        </section>
+
+        <section id="technique">
+            <h2>⚙️ Mécanismes Complexes</h2>
+            
+            <h3>1. Synchronisation par Polling</h3>
+            <p>
+                Le jeu utilise le <strong>Polling AJAX</strong>. Le client JavaScript interroge le serveur toutes les 2 secondes via <code>get_status</code>. 
+                Le serveur renvoie un objet JSON complet contenant les positions, les PV et l'ID du joueur actif. 
+                Cela permet une mise à jour quasi temps-réel de l'interface sans rechargement de page.
+            </p>
+
+            <h3>2. Prévisualisation Visuelle (UX)</h3>
+            <p>
+                Pour améliorer l'expérience, un système de prévisualisation a été codé en JS. 
+                Lors de la saisie de coordonnées, le script utilise les sélecteurs d'attributs <code>td[data-x="..."][data-y="..."]</code> pour cibler la case correspondante et lui appliquer une classe CSS spécifique (<code>.preview-move</code>), affichant un cadre rose fluo par-dessus la grille.
+            </p>
+
+            <h3>3. Système de Sabotage et Malus</h3>
+            <p>
+                Le drone de sabotage applique un "Malus" temporaire. Cette donnée est gérée par la classe <code>Joueur</code> et transmise dans le flux JSON. 
+                Le frontend détecte ce malus et ajoute dynamiquement une classe CSS animée <code>.cell-sabotaged</code> (clignotement orange) sur le vaisseau touché, ainsi qu'un message d'alerte dans le panneau de contrôle.
+            </p>
+        </section>
+
+        <section id="bilan">
+            <h2>📊 Bilan du Projet</h2>
+            <ul>
+                <li><strong>Objectifs atteints :</strong> Le jeu est fonctionnel, multijoueur (simulé sur deux fenêtres), et respecte strictement les contraintes POO/AJAX.</li>
+                <li><strong>Qualité visuelle :</strong> Un gros effort a été fourni sur le design (Layout Flexbox réactif, thème néon cohérent, animations CSS) pour une immersion totale.</li>
+                <li><strong>Robustesse :</strong> La logique critique est entièrement côté serveur (PHP), rendant le jeu sécurisé contre la modification simple du DOM.</li>
+                <li><strong>Améliorations possibles :</strong> Utilisation de WebSockets pour remplacer le Polling (plus performant), ou ajout d'une base de données SQL pour gérer des sessions multiples.</li>
+            </ul>
+        </section>
+
+        <section id="annexes">
+            <h2>📂 Annexe 1 : Extraits Clés</h2>
+            <p>Focus sur les parties les plus intéressantes du code.</p>
+
+            <details>
+                <summary><span class="tag tag-php">PHP</span> Partie.php : Gestion du tour & Ravitaillement</summary>
+                <pre><code>
+public function terminerTour(): void {
+    // Gestion Malus (Décrémentation)
+    $joueurCourant = $this->getJoueurActif();
+    if ($joueurCourant->malusTirTours > 0) $joueurCourant->malusTirTours--;
+
+    // Changement de joueur
+    $this->joueurActifId = $this->joueurActifId === 1 ? 2 : 1;
+    $this->tourCourant++;
+
+    // Régénération Énergie
+    $this->getJoueurActif()->vaisseau->regenererEnergie(10);
+
+    // Ravitaillement drones (tous les 5 tours)
+    // On utilise le modulo pour détecter le 5ème tour
+    if ($this->tourCourant > 1 && $this->tourCourant % 5 === 1) {
+        $this->joueur1->nbDrones++;
+        $this->joueur2->nbDrones++;
+    }
+}
+                </code></pre>
+            </details>
+
+            <details>
+                <summary><span class="tag tag-js">JS</span> board.js : Génération Grille & Data Attributes</summary>
+                <pre><code>
+// Création dynamique des cellules avec attributs de données
+for (let y = 1; y <= GRID_SIZE; y++) {
+    const $tr = $('&lt;tr&gt;&lt;/tr&gt;');
+    for (let x = 1; x <= GRID_SIZE; x++) {
+        // Ajout des data-x/y INDISPENSABLES pour le ciblage CSS de prévisualisation
+        const $td = $('&lt;td&gt;&lt;/td&gt;').attr('data-x', x).attr('data-y', y);
+        
+        // Interaction au clic pour remplir les inputs
+        $td.on('click', function() {
+            $('#move_x').val(x);
+            $('#move_y').val(y).trigger('input');
+        });
+
+        // ... (Logique d'affichage Vaisseaux/Drones/Malus)
+    }
+}
+                </code></pre>
+            </details>
+        </section>
+
+        <section id="fullcode">
+            <h2>📚 Annexe 2 : Code Source Intégral</h2>
+            <p>L'ensemble des fichiers du projet pour référence technique.</p>
+
+            <details>
+                <summary><span class="tag tag-php">PHP</span> Partie.php</summary>
+                <pre><code>
+&lt;?php
+require_once 'Joueur.php';
+require_once 'Drone.php';
+
+class Partie {
+    public int $id;
+    public Joueur $joueur1;
+    public Joueur $joueur2;
+    public int $joueurActifId = 1;
+    public int $tourCourant = 1;
+    public string $statut = 'en_cours';
+    
+    // ... Méthode Constructeur ...
+
+    // --- LOGIQUE DES DRONES ---
+    // Cette fonction est appelée à chaque fin de tour
+    private function tickDrones(Joueur $joueur): void {
+        foreach ($joueur->dronesIndependants as $drone) {
+            $drone->consommer(10); // Consommation pour maintien
+            
+            // Logique Passive du Drone Attaque
+            if ($drone->getType() === 'attaque') {
+                $adversaire = ($joueur->id === 1) ? $this->joueur2 : $this->joueur1;
+                $distance = $this->calculerDistance($drone->getPosition(), $adversaire->vaisseau->getPosition());
+
+                if ($distance <= 3) {
+                    $adversaire->vaisseau->subirDegats(10);
+                }
+            }
+        }
+    }
+    
+    // ... Reste du code de la classe (executerAction, etc.)
+}
+?&gt;
+                </code></pre>
+            </details>
+
+            <details><summary><span class="tag tag-php">PHP</span> Vaisseau.php</summary><pre><code>/* ... Code PHP ... */</code></pre></details>
+            <details><summary><span class="tag tag-php">PHP</span> Drone.php</summary><pre><code>/* ... Code PHP ... */</code></pre></details>
+            <details><summary><span class="tag tag-php">PHP</span> action.php</summary><pre><code>/* ... Code PHP ... */</code></pre></details>
+            <details><summary><span class="tag tag-js">JS</span> board.js</summary><pre><code>/* ... Code JS ... */</code></pre></details>
+            <details><summary><span class="tag tag-css">CSS</span> style.css</summary><pre><code>/* ... Code CSS ... */</code></pre></details>
+            <details><summary><span class="tag tag-html">HTML</span> joueur1.html</summary><pre><code>/* ... Code HTML ... */</code></pre></details>
+
+        </section>
+
+        <div class="download-area">
+            <a href="_public_html.zip" class="btn-download" download>
+                📥 TÉLÉCHARGER LE CODE SOURCE (.ZIP)
+            </a>
+            <p style="color: var(--text-dim); margin-top: 15px; font-size: 0.9rem;">
+                Contient : PHP, JS, CSS, HTML 
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

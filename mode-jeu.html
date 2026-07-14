@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mode de Jeu - SpaceWar</title>
+    <style>
+        @font-face {
+            font-family: 'Terbaang';
+            src: url('assets/fonts/Terbaang.otf') format('opentype');
+        }
+
+        body {
+            margin: 0; height: 100vh;
+            background: url('assets/logo/image.png') no-repeat center center fixed;
+            background-size: cover;
+            background-color: #000;
+            font-family: 'Terbaang', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 20px #00d2ff;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* --- CARTES DE CHOIX --- */
+        .mode-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #555;
+            border-radius: 20px;
+            padding: 30px;
+            width: 280px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card:hover {
+            border-color: #00ff00;
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .mode-card h2 { margin: 0 0 10px 0; font-size: 1.8rem; }
+        .mode-card p { font-family: sans-serif; color: #ccc; font-size: 0.9rem; }
+        .icon { font-size: 3rem; margin-bottom: 15px; display: block; }
+
+        /* --- SECTION INPUT CODE (Cachée par défaut) --- */
+        .input-section {
+            display: none;
+            margin-top: 20px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #00d2ff;
+            background: transparent;
+            color: white;
+            text-align: center;
+            font-size: 1.2rem;
+            font-family: sans-serif;
+            text-transform: uppercase;
+        }
+
+        button {
+            padding: 10px;
+            background: #00ff00;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --- SECTION CODE GÉNÉRÉ (Cachée par défaut) --- */
+        .code-display {
+            display: none;
+            margin-top: 15px;
+            background: rgba(0, 210, 255, 0.2);
+            border: 2px dashed #00d2ff;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .generated-code {
+            font-size: 2rem;
+            color: #00d2ff;
+            letter-spacing: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>TYPE DE COMBAT</h1>
+
+    <div class="container">
+        
+        <div class="mode-card" onclick="startLocal()">
+            <span class="icon">🖥️</span>
+            <h2>LOCAL</h2>
+            <p>1 Écran • 2 Joueurs</p>
+            <p style="color:#00ff00; font-size:0.8rem">Écran scindé</p>
+        </div>
+
+        <div class="mode-card" id="card-create">
+            <span class="icon">📡</span>
+            <h2>CRÉER</h2>
+            <p>Joueur 1 • Hôte</p>
+            
+            <div class="code-display" id="code-area">
+                <p>PARTAGEZ CE CODE :</p>
+                <div class="generated-code" id="my-code">----</div>
+                <button style="margin-top:10px; width:100%" onclick="enterLobbyAsCreator()">LANCER LA SALLE</button>
+            </div>
+        </div>
+
+        <div class="mode-card" id="card-join">
+            <span class="icon">🚀</span>
+            <h2>REJOINDRE</h2>
+            <p>Joueur 2 • Invité</p>
+
+            <div class="input-section" id="join-area">
+                <input type="text" id="input-code" placeholder="CODE DE SALLE" maxlength="4">
+                <button onclick="joinLobby()">VALIDER</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. MODE LOCAL ---
+        function startLocal() {
+            window.location.href = 'choix-joueur.php?mode=local';
+        }
+
+        // --- 2. LOGIQUE CRÉATION (Joueur 1) ---
+        const cardCreate = document.getElementById('card-create');
+        const codeArea = document.getElementById('code-area');
+        const myCodeDisplay = document.getElementById('my-code');
+        let generatedCode = "";
+
+        cardCreate.addEventListener('click', function(e) {
+            // Si on clique sur le bouton, on ne relance pas l'anim
+            if(e.target.tagName === 'BUTTON') return;
+
+            // Génération d'un code aléatoire (Ex: K9X2)
+            if(codeArea.style.display !== 'block') {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                generatedCode = "";
+                for(let i=0; i<4; i++) {
+                    generatedCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                myCodeDisplay.innerText = generatedCode;
+                
+                // Affichage visuel
+                codeArea.style.display = 'block';
+                document.getElementById('join-area').style.display = 'none'; // Ferme l'autre
+            }
+        });
+
+        function enterLobbyAsCreator() {
+            // On redirige en tant que JOUEUR 1 avec le code dans l'URL
+            window.location.href = `choix-joueur.php?mode=online&role=1&room=${generatedCode}`;
+        }
+
+
+        // --- 3. LOGIQUE REJOINDRE (Joueur 2) ---
+        const cardJoin = document.getElementById('card-join');
+        const joinArea = document.getElementById('join-area');
+        const inputCode = document.getElementById('input-code');
+
+        cardJoin.addEventListener('click', function(e) {
+            if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+
+            joinArea.style.display = 'flex';
+            codeArea.style.display = 'none'; // Ferme l'autre
+        });
+
+        function joinLobby() {
+            const code = inputCode.value.toUpperCase();
+            if(code.length < 4) {
+                alert("Code invalide (4 caractères requis)");
+                return;
+            }
+            // On redirige en tant que JOUEUR 2 avec le code
+            window.location.href = `choix-joueur.php?mode=online&role=2&room=${code}`;
+        }
+
+    </script>
+</body>
+</html>

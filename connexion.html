@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion au Jeu Fondation</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+        .login-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; }
+        h1 { color: #333; }
+        select, button { padding: 10px 20px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; cursor: pointer; }
+        button { background-color: #4CAF50; color: white; border: none; transition: background-color 0.3s; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>🚀 Choisissez votre rôle pour la partie</h1>
+
+        <label for="joueurSelect">Je joue en tant que :</label>
+        <select id="joueurSelect">
+            <option value="1">Joueur 1 (Vaisseau Principal)</option>
+            <option value="2">Joueur 2 (Flotte Indépendante)</option>
+        </select>
+
+        <p>
+            Ouvrez cette page sur deux onglets/fenêtres, puis choisissez Joueur 1 dans le premier écran et Joueur 2 dans le second.
+        </p>
+        
+        <button onclick="connecterEtLancer()">Lancer la partie pour mon rôle</button>
+    </div>
+
+    <script>
+        function connecterEtLancer() {
+            const joueurId = document.getElementById('joueurSelect').value;
+            
+            // Redirige vers la page de jeu en passant l'ID du joueur dans l'URL
+            // L'index.html lira cet ID pour savoir qui il est.
+            window.location.href = `index.html?joueur_id=${joueurId}`;
+        }
+    </script>
+</body>
+</html>

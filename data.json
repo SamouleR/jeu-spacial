@@ -1,0 +1,36 @@
+{
+  "vaisseaux": [
+    { "id": "v1", "nom": "Falcon", "img": "assets/ships/ship1.png" },
+    { "id": "v2", "nom": "Viper", "img": "assets/ships/ship2.png" },
+    { "id": "v3", "nom": "X-Wing", "img": "assets/ships/ship3.png" },
+    { "id": "v4", "nom": "Tie Fighter", "img": "assets/ships/ship4.png" },
+    { "id": "v5", "nom": "Wraith", "img": "assets/ships/ship5.png" },
+    { "id": "v6", "nom": "Ghost", "img": "assets/ships/ship6.png" },
+    { "id": "v7", "nom": "Bomber", "img": "assets/ships/ship7.png" },
+    { "id": "v8", "nom": "Reaper", "img": "assets/ships/ship8.png" },
+    { "id": "v9", "nom": "Interceptor", "img": "assets/ships/ship9.png" },
+    { "id": "v10", "nom": "Destroyer", "img": "assets/ships/ship10.png" },
+    { "id": "v11", "nom": "Cruiser", "img": "assets/ships/ship11.png" },
+    { "id": "v12", "nom": "Corsair", "img": "assets/ships/ship12.png" },
+    { "id": "v13", "nom": "Phoenix", "img": "assets/ships/ship13.png" },
+    { "id": "v14", "nom": "Valkyrie", "img": "assets/ships/ship14.png" },
+    { "id": "v15", "nom": "Titan", "img": "assets/ships/ship15.png" }
+  ],
+  "drones": [
+    { "id": "d1", "nom": "Repair Bot", "img": "assets/drones/drone1.png" },
+    { "id": "d2", "nom": "Attack Bot", "img": "assets/drones/drone2.png" },
+    { "id": "d3", "nom": "Shield Bot", "img": "assets/drones/drone3.png" },
+    { "id": "d4", "nom": "Spy Bot", "img": "assets/drones/drone4.png" },
+    { "id": "d5", "nom": "Kamikaze", "img": "assets/drones/drone5.png" },
+    { "id": "d6", "nom": "Medic", "img": "assets/drones/drone6.png" },
+    { "id": "d7", "nom": "Tank Bot", "img": "assets/drones/drone7.png" },
+    { "id": "d8", "nom": "Sniper", "img": "assets/drones/drone8.png" },
+    { "id": "d9", "nom": "Scout", "img": "assets/drones/drone9.png" },
+    { "id": "d10", "nom": "EMP Drone", "img": "assets/drones/drone10.png" },
+    { "id": "d11", "nom": "Lure Bot", "img": "assets/drones/drone11.png" },
+    { "id": "d12", "nom": "Turret", "img": "assets/drones/drone12.png" },
+    { "id": "d13", "nom": "Carrier", "img": "assets/drones/drone13.png" },
+    { "id": "d14", "nom": "Swarm", "img": "assets/drones/drone14.png" },
+    { "id": "d15", "nom": "Nano Bot", "img": "assets/drones/drone15.png" }
+  ]
+}
